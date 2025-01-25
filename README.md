@@ -81,6 +81,12 @@ Run the test cases using JUnit to ensure all features work as expected:
 mvn test
 ```
 
+## Credits
+1. Built by Thet Naung Soe, Soh Yong Sheng, Chen Yiqiu (Sophie) and Zhao Ziyang.
+2. Submitted as module project for NUS-ISS Graduate Certificate in Digital Solutions Development - Web Application Development.
+
+
+
 
 
 
