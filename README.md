@@ -42,8 +42,8 @@ The Leave Application Processing System (LAPS) is a robust Java-based solution d
 1. Clone the repository:
 
    ```bash
-   git clone <repository_url>
-   cd team6_java_ca_final
+   git clone git@github.com:tns30-dev/leave-application-processing-system.git
+   cd leave-application-processing-system 
    ```
 
 2. Configure the database: Update `application.properties` with your MySQL database credentials:
@@ -64,6 +64,7 @@ The Leave Application Processing System (LAPS) is a robust Java-based solution d
     ```bash
     mvn test -Dtest=DataInitializationTest
     ```
+    
 5. Run the application:
 
    ```bash
