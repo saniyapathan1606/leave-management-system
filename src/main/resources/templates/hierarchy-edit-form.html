@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments::html_head}">
+</head>
+
+<div>
+	<!-- Navbar -->
+	<div th:replace="~{fragments::navbar-admin}"></div>
+
+	<!-- Banner -->
+	<div th:replace="~{fragments::banner-admin}"></div>
+
+	<!-- Content -->
+	<section class="p-4">
+		<div class="container mt-2">
+			<div class="container" style="width: 40%; float: left;">
+				<form action="/admin/hierarchy/edit/mgrId" method="post" th:object="${employee}" class="form">
+					<input type="hidden" name="empId" th:value="${employee.userId}" />
+					<div class="form-group row justify-content-start my-2">
+						<label>Employee Id:</label>
+						<input type="text" th:value="${employee.userId}" readonly>
+					</div>
+					<div class="form-group row justify-content-start my-2">
+						<label>Full Name:</label>
+						<input type="text" th:value="${employee.firstName} + ' ' + ${employee.lastName}" readonly>
+					</div>
+
+					<div class="form-group row justify-content-start my-2">
+						<label>Current Employee Type:</label>
+						<input type="text" th:value="${employee.empType.empTypeName}" readonly>
+					</div>
+					<div class="form-group row justify-content-start my-2">
+						<label>Manager:</label>
+						<select name="managerId">
+							<option value="0" th:selected="${employee.manager == null}">No Manager</option>
+							<option th:each="manager : ${managerEmployees}" th:if="${manager.isManager}"
+								th:value="${manager.userId}" th:text="${manager.firstName + ' ' + manager.lastName}"
+								th:disabled="${manager.userId == employee.userId}">
+							</option>
+						</select>
+					</div>
+					<div class="my-4">
+						<button type="submit" class="btn btn-primary">Save</button>
+						<a th:href="@{/admin/managestaff}" class="btn btn-secondary">Back</a>
+					</div>
+				</form>
+			</div>
+		</div>
+	</section>
+
+	<!-- Footer -->
+	<div th:replace="~{fragments::footer}"></div>
+
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+		crossorigin="anonymous"></script>
+	</body>
+
+</html>

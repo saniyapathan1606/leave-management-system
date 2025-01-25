@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">	
+<link rel="stylesheet" th:href="@{/css/style1.css}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+	
+</style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <div th:replace="fragments :: navbar"></div>
+    <!-- Banner -->
+    <div th:replace="fragments :: banner"></div>
+
+    <!-- Content -->
+    <div class="container mt-2">
+        <h3>View Employee Leave History</h3>
+		<form id="dateForm" action="" method="get">
+		    <div class="form-group">
+		        <label for="dateDropdown"></label>
+		        <select class="form-control" id="dateDropdown" name="dateDropdown">
+		            <option value="">--Select a month and year--</option>
+		        </select>
+		    </div>
+		    <input type="hidden" id="managerId" th:value="${user.userId}" />
+		    <button type="submit" class="btn btn-primary">Submit</button>
+		</form>
+		
+		<div>
+			<div class="mb-3">
+			        <span class="badge leaveStatus-approved">Approved</span>
+			        <span class="badge leaveStatus-applied">Applied</span>
+			    </div>
+
+		            <div class="table-responsive">
+		                <table class="table table-bordered table-striped">
+		                    <thead class="thead-dark">
+		                        <tr>
+		                            <th style="position: sticky; left: 0; background-color: white; z-index: 1; color: black;">Name</th>
+		                            <th th:each="day : ${days}" th:text="${day}"></th>
+		                        </tr>
+		                        <tr>
+		                            <th style="position: sticky; left: 0; background-color: white; z-index: 1; color: black;">Day</th>
+		                            <th th:each="weekday : ${weekdays}" th:text="${weekday}"></th>
+		                        </tr>
+		                    </thead>
+		                    <tbody>
+								<tr th:each="targetLeaveRecord : ${targetEmployeeLeaveRecords}">
+								         <td style="position: sticky; left: 0; background-color: white; z-index: 1;" th:text="${targetLeaveRecord.employee.firstName} + ' ' +  ${targetLeaveRecord.employee.lastName}"></td>
+								             <td th:each="day : ${days}"
+								                 th:classappend="${day >= targetLeaveRecord.leaveDate.dayOfMonth && day <= targetLeaveRecord.endDate.dayOfMonth && (targetLeaveRecord.status.toString() == 'Approved' || targetLeaveRecord.status.toString() == 'Applied')} ? 'leaveStatus-' + ${targetLeaveRecord.status.toString().toLowerCase()}  : ''">
+								                 <span th:if="${day >= targetLeaveRecord.leaveDate.dayOfMonth && day <= targetLeaveRecord.endDate.dayOfMonth && (targetLeaveRecord.status.toString() == 'Approved' || targetLeaveRecord.status.toString() == 'Applied')}"></span>
+								          </td>
+								  </tr>
+		                    </tbody>
+		                </table>
+		            </div>
+		        </div>
+
+        <div>
+            <div class="mb-3">
+                <span th:each="leaveType : ${leaveTypes}"
+                      th:class="'badge leave-' + ${leaveType.leaveTypeId}"
+                      th:text="${leaveType.leaveTypeName}"></span>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th style="position: sticky; left: 0; background-color: white; z-index: 1; color: black;">Name</th>
+                            <th th:each="day : ${days}" th:text="${day}"></th>
+                        </tr>
+                        <tr>
+                            <th style="position: sticky; left: 0; background-color: white; z-index: 1; color: black;">Day</th>
+                            <th th:each="weekday : ${weekdays}" th:text="${weekday}"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="targetLeaveRecord : ${targetEmployeeLeaveRecords}">
+							<td style="position: sticky; left: 0; background-color: white; z-index: 1;" th:text="${targetLeaveRecord.employee.firstName} + ' ' +  ${targetLeaveRecord.employee.lastName}"></td>
+                            <td th:each="day : ${days}"
+                                th:classappend="${day >= targetLeaveRecord.leaveDate.dayOfMonth && day <= targetLeaveRecord.endDate.dayOfMonth && targetLeaveRecord.status.toString() == 'Approved'} ? 'leave-' + ${targetLeaveRecord.leaveType.leaveTypeId} : ''">
+                                <span th:if="${day >= targetLeaveRecord.leaveDate.dayOfMonth && day <= targetLeaveRecord.endDate.dayOfMonth && targetLeaveRecord.Status.toString() == 'Approved'}"></span>
+                            </td>
+							
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Leave Records by Type -->
+        <div th:each="entry : ${leaveRecordsByType}">
+            <div class="d-flex align-items-center mb-3">
+                <h3 th:text="${entry.key + ' ' + entry.value.size()}"></h3>
+                <span th:if="${pendingLeaveRecordsByType[entry.key] > 0}" style="background-color: #d4edda; color: #155724; padding: 0.25em 0.5em; border-radius: 0.25rem; margin-left: 0.5em;" th:text="'+' + ${pendingLeaveRecordsByType[entry.key]}"></span>
+            </div>
+            
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>No of working days</th>
+                        <th>Holidays/Weekends</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="leaveRecord : ${entry.value}">
+                        <td th:text="${leaveRecord.employee.firstName + ' ' + leaveRecord.employee.lastName}"></td>
+                        <td><a th:href="'mailto:' + ${leaveRecord.employee.email}" th:text="${leaveRecord.employee.email}" class="email-link"></a></td>
+                        <td th:text="${leaveRecord.leaveDate}"></td>
+                        <td th:text="${leaveRecord.endDate}"></td>
+                        <td th:text="${leaveRecordWorkingDaysMap[leaveRecord.leaveId] != null ? leaveRecordWorkingDaysMap[leaveRecord.leaveId] : ''}"
+                            th:attr="data-working-days=${leaveRecordWorkingDaysMap[leaveRecord.leaveId]}">
+                        </td>
+                        <td th:text="${leaveRecordHolidayWeekendMap[leaveRecord.leaveId]}"></td>
+                        <td>
+                            <span th:classappend="'status ' + 
+                                                (${leaveRecord.status.toString()} == 'Applied' ? 'status-pending' : '') +
+                                                (${leaveRecord.status.toString()} == 'Approved' ? 'status-approved' : '') +
+                                                (${leaveRecord.status.toString()} == 'Rejected' ? 'status-rejected' : '')"
+                                th:text="${leaveRecord.status}">
+                             </span>
+                        </td>
+                        <td>
+                            <div th:if="${leaveRecord.status.toString()} == 'Applied'">
+                                <button class="btn btn-success" th:onclick="'approveLeave(' + ${leaveRecord.leaveId} + ')'">Approve</button>
+                                <button class="btn btn-danger" th:onclick="'rejectLeave(' + ${leaveRecord.leaveId} + ')'">Reject</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div th:replace="fragments :: footer"></div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll("[data-working-days]").forEach(function(element) {
+                var workingDays = parseFloat(element.getAttribute("data-working-days"));
+                if (Number.isInteger(workingDays)) {
+                    element.textContent = workingDays.toFixed(0);
+                } else {
+                    element.textContent = workingDays.toFixed(1);
+                }
+            });
+        });
+
+        function approveLeave(leaveId) {
+            fetch(`/manager/leave/approve/${leaveId}`, {
+                method: 'GET'
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.text();
+                }
+                throw new Error('Network response was not ok.');
+            })
+            .then(text => {
+                location.reload(); 
+            })
+            .catch(error => console.error('There was a problem with the fetch operation:', error));
+        }
+
+        function rejectLeave(leaveId) {
+            fetch(`/manager/leave/reject/${leaveId}`, {
+                method: 'GET'
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.text();
+                }
+                throw new Error('Network response was not ok.');
+            })
+            .then(text => {
+                location.reload(); 
+            })
+            .catch(error => console.error('There was a problem with the fetch operation:', error));
+        }
+
+        const startDate = new Date('2022-06-01');
+        const endDate = new Date('2026-06-01');
+        const dateDropdown = document.getElementById('dateDropdown');
+        const managerId = document.getElementById('managerId').value;
+
+        let currentDate = new Date(startDate);
+
+        while (currentDate <= endDate) {
+            const option = document.createElement('option');
+            const yearMonth = currentDate.toISOString().split('T')[0].slice(0, 7);
+            option.value = yearMonth;
+            option.textContent = yearMonth;
+            dateDropdown.appendChild(option);
+
+            currentDate.setMonth(currentDate.getMonth() + 1);
+        }
+
+        document.getElementById('dateForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const selectedDate = dateDropdown.value;
+            if (selectedDate) {
+                this.action = `/manager/check/${managerId}?startDate=${selectedDate}`;
+                this.submit();
+            } else {
+                alert('Please select a date.');
+            }
+        });
+    </script>
+	
+</body>
+</html>
+
+
+

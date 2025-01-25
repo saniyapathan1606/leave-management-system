@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<title>Leave Application Form</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+	<style>
+		#startDateError,
+		#endDateError,
+		#spelling-error {
+			color: red;
+		}
+	</style>
+	<script>
+		let publicHolidays = [];
+		let usedLeaveQty = 0;
+
+		async function fetchPublicHolidays() {
+			try {
+				const response = await fetch('/public-holidays/getHolidays');
+				if (response.ok) {
+					publicHolidays = await response.json();
+					console.log('Fetched public holidays:', publicHolidays);
+				} else {
+					console.error('Failed to fetch public holidays:', response.statusText);
+				}
+			} catch (error) {
+				console.error('Error fetching public holidays:', error);
+			}
+		}
+
+		async function fetchUsedLeaveQty() {
+			try {
+				const response = await fetch('/leaveconsumption/getUsedLeaveQty');
+				if (response.ok) {
+					usedLeaveQty = await response.json();
+					console.log('Fetched used leave quantity:', usedLeaveQty);
+				} else {
+					console.error('Failed to fetch used leave quantity:', response.statusText);
+				}
+			} catch (error) {
+				console.error('Error fetching used leave quantity:', error);
+			}
+		}
+
+		function isPublicHoliday(date) {
+			const formattedDate = date.toISOString().split('T')[0];
+			return publicHolidays.some(holiday => holiday.date === formattedDate);
+		}
+
+		document.addEventListener('DOMContentLoaded', async function () {
+			await fetchPublicHolidays();
+			await fetchUsedLeaveQty();
+
+			const form = document.getElementById('leaveForm');
+			form.addEventListener('submit', function (event) {
+				const leaveDate = new Date(document.getElementById('leaveDate').value);
+				const endDate = new Date(document.getElementById('endDate').value);
+				const leaveType = document.getElementById('leaveType').value;
+				const currentDate = new Date();
+				currentDate.setHours(0, 0, 0, 0);
+
+				// Reset error messages
+				document.getElementById("startDateError").innerHTML = "";
+				document.getElementById("endDateError").innerHTML = "";
+
+				// Check if leave date is earlier than the current date
+				if (leaveDate < currentDate) {
+					event.preventDefault();
+					document.getElementById("startDateError").innerHTML = "Leave date must not be earlier than the current date.";
+					return;
+				}
+
+				// Check if leave date is earlier than the end date
+				if (leaveDate >= endDate) {
+					event.preventDefault();
+					document.getElementById("startDateError").innerHTML = "Leave date must be earlier than the end date.";
+					return;
+				}
+
+				// Check if leave date is a weekend
+				const dayOfWeek = leaveDate.getDay();
+				if (dayOfWeek === 0 || dayOfWeek === 6) { // 0 is Sunday, 6 is Saturday
+					event.preventDefault();
+					document.getElementById("startDateError").innerHTML = "Leave date cannot be a weekend (Saturday or Sunday).";
+					return;
+				}
+
+				// Check if leave date is a public holiday
+				if (isPublicHoliday(leaveDate)) {
+					event.preventDefault();
+					document.getElementById("startDateError").innerHTML = 'Leave date cannot be a public holiday.';
+					return;
+				}
+
+				const diffTime = Math.abs(endDate - leaveDate);
+				const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // Include end date in the count
+				if (leaveType == "1" && diffDays > 18) {
+					event.preventDefault();
+					document.getElementById("endDateError").innerHTML = 'Leave date range cannot be more than 18 days for the selected leave type.';
+					return;
+				} else if (leaveType == "2" && diffDays > 60) {
+					event.preventDefault();
+					document.getElementById("endDateError").innerHTML = 'Leave date range cannot be more than 60 days for the selected leave type.';
+					return;
+				}
+
+				// Check if total leave exceeds the allowed limit
+				const totalLeave = usedLeaveQty + diffDays;
+				if ((leaveType == "1" && totalLeave > 18) || (leaveType == "2" && totalLeave > 60)) {
+					event.preventDefault();
+					document.getElementById("endDateError").innerHTML = 'Total leave exceeds the allowed limit for the selected leave type.';
+					return;
+				}
+			});
+		});
+
+		function toggleContactDetail() {
+			const isOverseasCheckbox = document.getElementById('isOverseas');
+			const contactDetailField = document.getElementById('contactDetail');
+			const contactDetailLabel = document.getElementById('contactDetailLabel');
+
+			if (isOverseasCheckbox.checked) {
+				contactDetailField.required = true;
+				contactDetailLabel.innerHTML = 'Contact Detail (Required):';
+			} else {
+				contactDetailField.required = false;
+				contactDetailLabel.innerHTML = 'Contact Detail (Optional):';
+			}
+		}
+
+		function toggleHalfDayCheckbox() {
+			const leaveTypeSelect = document.getElementById('leaveType');
+			const halfDayDiv = document.getElementById('halfDayDiv');
+			const halfDayCheckbox = document.getElementById('halfDay');
+
+			if (leaveTypeSelect.options[leaveTypeSelect.selectedIndex].text === 'Compensation') {
+				halfDayDiv.style.display = 'block';
+				halfDayCheckbox.disabled = false;
+			} else {
+				halfDayDiv.style.display = 'none';
+				halfDayCheckbox.disabled = true;
+				halfDayCheckbox.checked = false; // Reset checkbox state
+			}
+		}
+
+		window.onload = function () {
+			document.getElementById('isOverseas').addEventListener('change', toggleContactDetail);
+			document.getElementById('leaveType').addEventListener('change', toggleHalfDayCheckbox);
+			toggleContactDetail();
+			toggleHalfDayCheckbox();
+		}
+	</script>
+</head>
+
+<body>
+	<!-- Navbar -->
+	<div th:replace="~{fragments::navbar}"></div>
+	<!-- Banner -->
+	<div th:replace="~{fragments::banner}"></div>
+
+	<div class="container mt-2">
+		<form th:action="@{/leavemgmt/create}" th:object="${empLeaveRecord}" method="post" id="leaveForm">
+			<div class="mb-3">
+				<label for="coveringEmployee" class="form-label">Covering Employee:</label>
+				<select class="form-select" id="coveringEmployee" th:field="*{coveringEmployee}" required>
+					<option value="">--Select Name--</option>
+					<option th:each="coveringEmployee : ${coveringEmployees}" th:value="${coveringEmployee.userId}"
+						th:text="${coveringEmployee.fullName}"></option>
+				</select>
+			</div>
+
+			<div class="mb-3">
+				<label for="leaveDate" class="form-label">Leave Date:</label>
+				<span id="startDateError"></span>
+				<input type="date" th:field="*{leaveDate}" id="leaveDate" class="form-control" required>
+			</div>
+
+			<div class="mb-3">
+				<label for="endDate" class="form-label">End Date:</label>
+				<span id="endDateError"></span>
+				<input type="date" th:field="*{endDate}" id="endDate" class="form-control" required>
+			</div>
+
+			<div class="mb-3">
+				<label for="leaveType" class="form-label">Leave Type:</label>
+				<select class="form-select" id="leaveType" th:field="*{leaveType}">
+					<option th:each="eachLeaveType : ${leaveTypes}" th:value="${eachLeaveType.leaveTypeId}"
+						th:text="${eachLeaveType.leaveTypeName}">--Select Type--</option>
+				</select>
+			</div>
+
+			<div class="mb-3 form-check" id="halfDayDiv" style="display:none;">
+				<input type="checkbox" class="form-check-input" id="halfDay" th:field="*{halfDay}" disabled>
+				<label class="form-check-label" for="halfDay">Half Day</label>
+			</div>
+
+			<div class="mb-3 form-check">
+				<input type="checkbox" class="form-check-input" id="isOverseas" th:field="*{overseas}">
+				<label class="form-check-label" for="isOverseas">Is Overseas?</label>
+			</div>
+
+			<div class="mb-3">
+				<label for="additionalReason" class="form-label">Additional Reason:</label>
+				<textarea th:field="*{additionalReason}" id="additionalReason" placeholder="Additional Reason"
+					class="form-control" required></textarea>
+			</div>
+
+			<div class="mb-3">
+				<label id="contactDetailLabel" for="contactDetail" class="form-label">Contact Detail:</label>
+				<input th:field="*{contactDetail}" id="contactDetail" placeholder="Contact Detail" class="form-control">
+			</div>
+
+			<button type="submit" class="btn btn-primary">Submit</button>
+		</form>
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

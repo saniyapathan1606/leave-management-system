@@ -1,0 +1,113 @@
+.card-deck {
+	  	align-items: stretch;
+	}
+
+	.card {
+		height: 300px;
+		border-radius: 10%;
+	}
+
+	.email-link 
+	{
+	    color: #6c757d; 
+	    text-decoration: none;
+	    font-weight: bold;
+	}
+
+	.email-link:hover {
+	    color: #5a6268; 
+	    text-decoration: underline;
+	}
+
+
+	html, body 
+	{
+	     height: 100%;
+	     margin: 0;
+	     display: flex;
+	     flex-direction: column;
+	}
+
+	body {
+	      flex: 1;
+	}
+
+	.container {
+	   flex: 1;
+	   }
+
+	footer {
+	        background-color: #EF7C00;
+	            color: white;
+	            padding: 10px 0;
+	            text-align: center;
+	            margin-top: auto;
+	            }
+	            
+	    .status-pending {
+	            background-color: #f8d7da;
+	            color: #721c24;
+	        }
+	        .status-approved {
+	            background-color: #d4edda;
+	            color: #155724;
+	        }
+	        .status-rejected {
+	            background-color: #f8d7da;
+	            color: #721c24;
+	        }    
+	        
+	.status {
+	            padding: 0.25em 0.75em;
+	            border-radius: 50px; 
+	            font-weight: bold;
+	            display: inline-block;
+	        }   
+	        
+	        
+	        .leave-1 {
+	            background-color: red;
+	            color: white;
+	        }
+	        .leave-2 {
+	            background-color: blue;
+	            color: white;
+	        }
+	        .leave-3 {
+	            background-color: green;
+	            color: white;
+	        }
+	        
+	         .leave-4 {
+	            background-color: yellow;
+	            color: white;
+	        }
+	        
+	          .leave-4 {
+	            background-color: indigo;
+	            color: white;
+	        }
+	        .table-responsive {
+	            overflow-x: auto;
+	        }
+	        th, td {
+	            white-space: nowrap;
+	            width: 50px;
+	            text-align: center;
+	            text-align: center;
+	    		vertical-align: top;
+	        }
+	        th:first-child, td:first-child {
+	            width: auto;
+	        }
+	        
+	        /* Leave Status Styles */
+.leaveStatus-approved {
+    background-color: #28a745; /* Green for Approved */
+    color: white;
+}
+
+.leaveStatus-applied {
+    background-color:#dc3545; /* Pink for Applied */
+    color: black;
+}

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments::html_head}"></head>
+
+<body>
+	<!-- Navbar -->
+	<div th:replace="~{fragments::navbar-admin}"></div>
+	<!-- Banner -->
+	<div th:replace="~{fragments::banner-admin}"></div>
+	<!-- Content -->
+	<div class="container mt-2">
+		<a href="/admin/public-holidays/add" class="btn btn-primary">Add Public Holiday</a>
+		<table class="table table-striped mt-3">
+			<thead>
+				<tr>
+					<th>Date</th>
+					<th>Name</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="publicHoliday : ${publicHolidays}">
+					<td th:text="${publicHoliday.date}"></td>
+					<td th:text="${publicHoliday.name}"></td>
+					<td>
+						<a th:href="@{'/public-holidays/delete/' + ${publicHoliday.id}}"
+							class="btn btn-danger">Delete</a>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<!-- Footer -->
+	<div th:replace="~{fragments::footer}"></div>
+</body>
+
+</html>

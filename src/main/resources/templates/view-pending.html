@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments::html_head}">
+</head>
+
+<body>
+	<!-- Navbar -->
+	<div th:replace="~{fragments::navbar}"></div>
+	<!-- Banner -->
+	<div th:replace="~{fragments::banner}"></div>
+
+	<!--Pending approval list/my team record list-->
+	<section>
+		<div class="container">
+			<ul class="nav nav-tabs py-1" id="myTab" role="tablist">
+				<li class="nav-item" role="presentation">
+					<button class="nav-link active" id="pendingleaves-tab" data-bs-toggle="tab"
+						data-bs-target="#pendingleaves-tab-pane" type="button" role="tab" style="color:#EF7C00">Pending
+						Requests</button>
+				</li>
+				<li class="nav-item" role="presentation">
+					<button class="nav-link" id="pendingclaims-tab" data-bs-toggle="tab"
+						data-bs-target="#pendingclaims-tab-pane" type="button" role="tab" style="color:#EF7C00">Pending
+						Claims</button>
+				</li>
+			</ul>
+			<!-- Pending leaves tab -->
+			<div class="tab-content" id="myTabContent">
+				<div class="tab-pane fade show active" id="pendingleaves-tab-pane" role="tabpanel" tabindex="0">
+					<p th:if="${not #lists.isEmpty(pendingleaves)}" class="pt-2"> Total: <span
+							th:text="${totalpendingleave}"></span> items</p>
+					<h3 th:if="${#lists.isEmpty(pendingleaves)}" class="pt-5"> There is no pending leave requests.</h3>
+					<div class="table-responsive">
+						<table th:if="${not #lists.isEmpty(pendingleaves)}" class="table w-100">
+							<colgroup>
+								<col style="width: 30%;">
+								<col style="width: 20%;">
+								<col style="width: 10%;">
+								<col style="width: 10%;">
+								<col style="width: 20%;">
+								<col style="width: 10%;">
+							</colgroup>
+							<thead>
+								<tr>
+									<th>Employee</th>
+									<th>Leave Type</th>
+									<th>Start</th>
+									<th>End</th>
+									<th>Actions</th>
+									<th>Details</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="pendingleave:${pendingleaves}">
+									<td
+										th:text="${pendingleave.employee.firstName +' ' +pendingleave.employee.lastName}">
+									</td>
+									<td th:text="${pendingleave.leaveType.leaveTypeName}"></td>
+									<td th:text="${pendingleave.leaveDate}"></td>
+									<td th:text="${pendingleave.endDate}"></td>
+									<td>
+										<a th:href="@{/manager/leave/approve/{id}(id=${pendingleave.leaveId})}"
+											class="btn btn-success btn-sm">Approve</a>
+										<a th:href="@{/manager/leave/reject/{id}(id=${pendingleave.leaveId})}"
+											class="btn btn-danger btn-sm">Reject</a>
+									</td>
+									<td><button type="button" class="btn btn-link"
+											th:attr="data-bs-target='#viewpendingleaveModal'+${pendingleave.leaveId}"
+											data-bs-toggle="modal">View</button></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<!-- View pending single leave modal -->
+					<div th:each="pendingleave:${pendingleaves}">
+						<div class="modal fade" th:id="'viewpendingleaveModal'+${pendingleave.leaveId}" tabindex="-1">
+							<div class="modal-dialog d-flex modal-dialog-centered">
+								<div class="modal-content w-75">
+									<div class="modal-header text-center" style="background-color: #EF7C00">
+										<h5 class="modal-title w-100 text-light" id="viewModalLabel">Leave Record
+											Details</h5>
+										<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+									</div>
+									<div class="modal-body">
+										<table class="table">
+											<tr>
+												<th>Employee</th>
+												<td
+													th:text="${pendingleave.employee.firstName +' ' +pendingleave.employee.lastName}">
+												</td>
+											</tr>
+											<tr>
+												<th>Type</th>
+												<td th:text="${pendingleave.leaveType.leaveTypeName}"></td>
+											</tr>
+											<tr>
+												<th>Start</th>
+												<td th:text="${pendingleave.leaveDate}"></td>
+											</tr>
+											<tr>
+												<th>End</th>
+												<td th:text="${pendingleave.endDate}"></td>
+											</tr>
+											<tr>
+												<th>Reason</th>
+												<td th:text="${pendingleave.additionalReason}"></td>
+											</tr>
+											<tr th:unless="${pendingleave.leaveType.leaveTypeName == 'Medical'}">
+												<th>Overseas</th>
+												<td th:text="${pendingleave.isOverseas}? 'Yes':'No'"></td>
+											</tr>
+											<tr th:if="${pendingleave.isOverseas}">
+												<th>Contact Details</th>
+												<td th:text="${pendingleave.contactDetail}"></td>
+											</tr>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- Pending claims tab -->
+				<div class="tab-pane fade" id="pendingclaims-tab-pane" role="tabpanel" tabindex="0">
+					<p th:if="${not #lists.isEmpty(pendingclaims)}" class="pt-2"> Total: <span
+							th:text="${totalpendingclaim}"></span> items</p>
+					<h3 th:if="${#lists.isEmpty(pendingclaims)}" class="pt-5"> There is no pending claims.</h3>
+					<div class="table-responsive">
+						<table th:if="${not #lists.isEmpty(pendingclaims)}" class="table w-100">
+							<colgroup>
+								<col style="width: 40%;">
+								<col style="width: 10%;">
+								<col style="width: 10%;">
+								<col style="width: 30%;">
+								<col style="width: 10%;">
+							</colgroup>
+							<thead>
+								<tr>
+									<th>Employee</th>
+									<th>Remark</th>
+									<th>Quantity</th>
+									<th>Actions</th>
+									<th>Details</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="pendingclaim:${pendingclaims}">
+									<td
+										th:text="${pendingclaim.employee.firstName+' ' +pendingclaim.employee.lastName}">
+									</td>
+									<td th:text="${pendingclaim.remarks}"></td>
+									<td th:text="${pendingclaim.claimQty}"></td>
+									<td>
+										<a th:href="@{/compensation/claim/approve/{id}(id=${pendingclaim.claimId})}"
+											class="btn btn-success btn-sm">Approve</a>
+										<a th:href="@{/compensation/claim/reject/{id}(id=${pendingclaim.claimId})}"
+											class="btn btn-danger btn-sm">Reject</a>
+									</td>
+									<td><button type="button" class="btn btn-link"
+											th:attr="data-bs-target='#viewpendingclaimModal'+${pendingclaim.claimId}"
+											data-bs-toggle="modal">View</button></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<!-- View pending single claim modal -->
+					<div th:each="pendingclaim:${pendingclaims}">
+						<div class="modal fade" th:id="'viewpendingclaimModal'+${pendingclaim.claimId}" tabindex="-1">
+							<div class="modal-dialog d-flex modal-dialog-centered">
+								<div class="modal-content w-75">
+									<div class="modal-header text-center" style="background-color: #EF7C00">
+										<h5 class="modal-title w-100 text-light" id="viewModalLabel">Claim Record
+											Details</h5>
+										<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+									</div>
+									<div class="modal-body">
+										<table class="table">
+											<tr>
+												<th>Employee</th>
+												<td
+													th:text="${pendingclaim.employee.firstName +' ' +pendingclaim.employee.lastName}">
+												</td>
+											</tr>
+											<tr>
+												<th>Remarks</th>
+												<td th:text="${pendingclaim.remarks}"></td>
+											</tr>
+											<tr>
+												<th>Qty</th>
+												<td th:text="${pendingclaim.claimQty}"></td>
+											</tr>
+											<tr>
+												<th>Created</th>
+												<td th:text="${pendingclaim.createTime}"></td>
+											</tr>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+
+	<!-- Footer -->
+	<div th:replace="~{fragments::footer}"></div>
+
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+		crossorigin="anonymous"></script>
+</body>
+
+</html>

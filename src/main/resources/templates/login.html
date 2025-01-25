@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments::html_head}">
+</head>
+
+<body>
+	<!-- Non-login Navbar -->
+	<div class="navbar mb-5">
+		<nav class="navbar navbar-expand-lg navbar-dark py-3 fixed-top" style="background-color:#EF7C00;">
+			<div class="container">
+				<a class="navbar-brand">
+					<img src="../img/branding-nus.png" alt="nus logo" width="100" height="43">
+					<img src="../img/iss-logo.png" alt="iss logo" width="100" height="43">
+				</a>
+			</div>
+		</nav>
+	</div>
+
+	<!-- Login window -->
+	<section class="p-3 mt-2">
+		<div class="container">
+			<div class="card mt-4 mx-auto border-0" style="width: 50%">
+				<div class="card-body text-center" style="background-color: #EF7C00; border-radius: 10%;">
+					<div class="text-light h1 my-4">
+						<i class="fa fa-user-circle-o fa-3x"></i>
+					</div>
+					<form th:action="@{/login}" method="post" class="form">
+						<div class="form-group row justify-content-center my-2">
+							<label for="username" class="col col-sm-3 col-form-label text-light" style="font-size: 1.2rem; width: 30%;">Username</label>
+							<div class="col-sm">
+								<input type="text" class="form-control" id="username" name="username" placeholder="Enter username" style="font-size: 1.2rem; width: 90%;"/>
+							</div>
+						</div>
+						<div class="form-group row justify-content-center my-2">
+							<label for="password" class="col col-sm-3 col-form-label text-light" style="font-size: 1.2rem; width: 30%;">Password</label>
+							<div class="col-sm">
+								<input type="password" class="form-control" id="password" name="password" placeholder="Enter password" style="font-size: 1.2rem; width: 90%;"/>
+							</div>
+						</div>
+						<div class="form-group row my-2">
+							<div class="col">
+							<button type="submit" class="btn btn-light my-2" style="font-size: 1.2rem; width: 15%;">Login</button>
+							</div>
+						</div>
+						<div th:if="${param.error}">
+							<p style="color:red">Invalid username or password.</p>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Footer -->
+	<div th:replace="~{fragments::footer}"></div>
+
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+		crossorigin="anonymous"></script>
+</body>
+
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments::html_head}">
+</head>
+
+<body>
+	<!-- Navbar -->
+	<div th:replace="~{fragments::navbar}"></div>
+	<!-- Banner -->
+	<div th:replace="~{fragments::banner}"></div>
+
+	<!--Leave Record Tabs-->
+	<section>
+		<div class="container">
+			<ul class="nav nav-tabs py-1" id="myTab" role="tablist">
+				<li class="nav-item" role="presentation">
+					<button class="nav-link active" id="requests-tab" data-bs-toggle="tab"
+						data-bs-target="#requests-tab-pane" type="button" role="tab" style="color:#EF7C00">My
+						Leaves</button>
+				</li>
+				<li class="nav-item" role="presentation">
+					<button class="nav-link" id="claims-tab" data-bs-toggle="tab" data-bs-target="#claims-tab-pane"
+						type="button" role="tab" style="color:#EF7C00">My Claims</button>
+				</li>
+				<!--
+				<li class="nav-item" role="presentation">
+					<button class="nav-link" id="balance-tab" data-bs-toggle="tab" data-bs-target="#balance-tab-pane"
+						type="button" role="tab" style="color:#EF7C00">My Balance</button>
+				</li>
+				-->
+			</ul>
+			<div class="tab-content" id="myTabContent">
+				<!-- Leave Requests Tab -->
+				<div class="tab-pane fade show active" id="requests-tab-pane" role="tabpanel" tabindex="0">
+					<div th:if="${not #lists.isEmpty(myleaves)}">
+						<p class="pt-2"> Total: <span th:text="${totalleave}"></span> items</p>
+						<a th:href="@{/history/leaves/download-csv}" class="btn btn-lg text-dark">
+							<i class="fa fa-file-excel-o fa-lg"></i>
+						</a>
+					</div>
+					<h3 th:if="${#lists.isEmpty(myleaves)}" class="py-5"> You have no leave records.</h3>
+					<table id="listTable" th:if="${not #lists.isEmpty(myleaves)}" class="table mb-5">
+						<colgroup>
+							<col style="width: 15%;">
+							<col style="width: 15%;">
+							<col style="width: 20%;">
+							<col style="width: 20%;">
+							<col style="width: 30%;">
+						</colgroup>
+						<thead>
+							<tr>
+								<th>Start</th>
+								<th>End</th>
+								<th>Leave Type</th>
+								<th>Status</th>
+								<th>Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="myleave:${myleaves}">
+								<td th:text="${myleave.leaveDate}"></td>
+								<td th:text="${myleave.endDate}"></td>
+								<td th:text="${myleave.leaveType.leaveTypeName}"></td>
+								<td th:text="${myleave.status}"></td>
+								<td>
+									<a th:if="${myleave.status.toString()} == 'Applied' or ${myleave.status.toString()} == 'Updated'"
+										th:href="@{/leavemgmt/update/{id}(id=${myleave.leaveId})}"
+										class="btn btn-primary btn-sm">Update</a>
+									<a th:if="${myleave.status.toString()} == 'Applied' or ${myleave.status.toString()} == 'Updated'"
+										th:href="@{/leavemgmt/delete/{id}(id=${myleave.leaveId})}"
+										class="btn btn-warning btn-sm">Delete</a>
+									<a th:if="${myleave.status.toString()} == 'Approved'"
+										th:href="@{/leavemgmt/cancel/{id}(id=${myleave.leaveId})}"
+										class="btn btn-danger btn-sm">Cancel</a>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+
+				</div>
+				<!-- Claims Tab -->
+				<div class="tab-pane fade" id="claims-tab-pane" role="tabpanel" tabindex="0">
+					<p th:if="${not #lists.isEmpty(myclaims)}" class="pt-2"> Total: <span
+							th:text="${totalclaim}"></span> items</p>
+					<h3 th:if="${#lists.isEmpty(myclaims)}" class="pt-5"> You have no claim records.</h3>
+					<table th:if="${not #lists.isEmpty(myclaims)}" class="table">
+						<colgroup>
+							<col style="width: 40%;">
+							<col style="width: 10%;">
+							<col style="width: 15%;">
+							<col style="width: 25%;">
+							<col style="width: 10%;">
+						</colgroup>
+						<thead>
+							<tr>
+								<th>Remark</th>
+								<th>Quantity</th>
+								<th>Status</th>
+								<th>Actions</th>
+								<th>Details</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="myclaim:${myclaims}">
+								<td th:text="${myclaim.remarks}"></td>
+								<td th:text="${myclaim.claimQty}"></td>
+								<td th:text="${myclaim.status}"></td>
+								<td>
+									<a th:if="${myclaim.status.toString()} == 'Pending'"
+										th:href="@{/compensation/claim/view/{id}(id=${myclaim.claimId})}"
+										class="btn btn-danger btn-sm">Cancel</a>
+									<p th:unless="${myclaim.status.toString()} == 'Pending'">Not Applicable</p>
+								</td>
+								<td>
+									<a th:href="@{/compensation/claim/view/{id}(id=${myclaim.claimId})}"
+										class="btn btn-link btn-sm">View</a>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+
+				</div>
+
+				<!-- Balance Tab 
+				<div class="tab-pane fade" id="balance-tab-pane" role="tabpanel" tabindex="0">
+					<table class="table">
+						<thead>
+							<tr>
+								<th>Year</th>
+								<th>LeaveType</th>
+								<th>Entitlement</th>
+								<th>Taken</th>
+								<th>Balance</th>
+							</tr>
+						</thead>
+						<tbody>
+
+						</tbody>
+					</table>
+				</div>
+				-->
+			</div>
+		</div>
+	</section>
+
+	<!-- Footer -->
+	<div th:replace="~{fragments::footer}"></div>
+
+</body>
+
+</html>

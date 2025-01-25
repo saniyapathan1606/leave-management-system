@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>New Staff</title>
+</head>
+<body>
+    <h1>New Employee</h1>
+    <form th:action="@{/employees}" th:object="${employee}" method="post">
+        <div>
+            <label>First Name:</label>
+            <input type="text" th:field="*{firstName}" />
+        </div>
+        <div>
+            <label>Last Name:</label>
+            <input type="text" th:field="*{lastName}" />
+        </div>
+        <div>
+            <label>Employee Position:</label>
+            <select th:field="*{empType}">
+                <option value="Professional">Professional</option>
+                <option value="Administrative">Administrative</option>
+            </select>
+        </div>
+        <div>
+            <label>Active or not:</label>
+            <select th:field="*{empStatus}">
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+            </select>
+        </div>
+        <div>
+            <label>Join Date:</label>
+            <input type="date" th:field="*{joinDate}" th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" />
+        </div>
+        <div>
+            <label>Manager ID:</label>
+            <input type="text" th:field="*{manager.empId}" />
+        </div>
+        <div>
+            <label>Password:</label>
+            <input type="password" th:field="*{passWord}" />
+        </div>
+        <div>
+            <button type="submit">Save</button>
+        </div>
+    </form>
+</body>
+</html>
