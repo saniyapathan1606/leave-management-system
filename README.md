@@ -127,8 +127,8 @@ This Leave Management System offers a robust, digital solution for automating th
 
 ## 👨‍💻 Contributors
 
-- [tns30-dev](https://github.com/tns30-dev) – Original Developer / Contributor
-- [Saniya Pathan](https://github.com/YOUR_GITHUB_USERNAME) – Customization, Setup, and Extension
+- [Saniya Pathan](https://github.com/saniyapathan0607) - Original Developer / Contributor
+
 
 ---
 
